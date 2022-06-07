@@ -86,7 +86,7 @@ function login($email, $password){
 function getUser($id){
     $conn = openConn();
 
-    $sql = "SELECT * FROM users WHERE id = ?";
+    $sql = "SELECT * FROM users WHERE uid = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute(array($id));
@@ -105,7 +105,7 @@ function getUser($id){
 function editProfile($firstname, $lastname, $username, $email, $phonenumber, $id){
     $conn = openConn();
 
-    $sql = "UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, phonenumber = ? WHERE id = ? ";
+    $sql = "UPDATE users SET firstName = ?, lastName = ?, username = ?, email = ?, phoneNumber = ? WHERE id = ? ";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute([$firstname, $lastname, $username, $email, $phonenumber, $id]);
@@ -162,14 +162,14 @@ function getReviews($id){
         return $data;
     }
 }
-function makeReview($customer_id, $seller_id, $rating, $review){
+function makeReview($customer_id, $shop_id, $rating, $review){
     $conn = openConn();
 
-    $sql = "INSERT INTO ratings (customer_id, shop_id, rating, review,) VALUES (?, ?, ?, ?) ";
+    $sql = "INSERT INTO ratings (customer_id, shop_id, rating, review) VALUES (?, ?, ?, ?) ";
 
 
     $stmt = $conn->prepare($sql);
-    $res = $stmt->execute([$customer_id, $seller_id, $rating, $review]);
+    $res = $stmt->execute([$customer_id, $shop_id, $rating, $review]);
     $row = $stmt->rowCount();
 
    //if query works
