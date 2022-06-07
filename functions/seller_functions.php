@@ -4,7 +4,21 @@ include_once('../../settings/connection.php');
 function uploadImage(){}
 function deleteImage(){}
 
-function createStore(){}
+function createStore($seller_id, $name){
+
+    $conn = openConn();
+    $sql = 'INSERT INTO shop (seller_id, name) VALUES (?,?)';
+    $stmt = $conn->prepare($sql);
+    $res = $stmt->execute([$seller_id, $name]);
+
+    if ($res) {
+        return 'success';
+        }
+       else {
+          return 'failed';
+       }
+
+}
 function deleteStore(){}
 function viewStores(){}
 function updateStore(){}
