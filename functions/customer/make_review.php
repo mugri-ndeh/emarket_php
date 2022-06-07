@@ -1,5 +1,8 @@
 <?php
 
+include_once("../customer_functions.php");
+
+
 $jsonData = json_decode(file_get_contents("php://input"), true);
 
 $customer_id = $jsonData['customer_id'];
@@ -12,8 +15,6 @@ $result = makeReview($customer_id, $seller_id, $rating, $review);
 $data = array(
     'state'=>$result,
 );
-
-var_dump($jsonData);
 
 
 echo json_encode($data);
