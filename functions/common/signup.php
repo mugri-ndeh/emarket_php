@@ -1,14 +1,14 @@
 <?php
 include_once("../customer_functions.php");
 
- $firstname = $_POST['firstname'];
- $lastname = $_POST['lastname'];
- $username = $_POST['username'];
- $email = $_POST['email'];
- $phonenumber = $_POST['phonenumber'];
- $password = $_POST['password'];
+$jsonData = json_decode(file_get_contents("php://input"), true);
 
- $result = signup($firstname, $lastname, $username, $email, $phonenumber, $password);
+
+ $username = $jsonData['username'];
+ $email = $jsonData['email'];
+ $password = $jsonData['password'];
+
+ $result = signup($username, $email, $password);
 
  $data = array(
     'state'=>$result,
