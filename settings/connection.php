@@ -8,7 +8,7 @@
    $host = "localhost";
    $user = "root";
    $password = "";
-   $db = "test_db";
+   $db = "emarket";
    
 //    if(!$conn){
 //       die("Connect failed:".mysqli_error());
