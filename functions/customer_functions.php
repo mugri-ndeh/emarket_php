@@ -1,26 +1,58 @@
 <?php
 include_once('../../settings/connection.php');
 
-function signup($firstname, $lastname, $username, $email, $phonenumber, $password){
+function signup($username, $email, $password){
 
     $conn = openConn();
-    $sql = "INSERT INTO user (firstname, lastname, username, email, phonenumber, password) VALUES (?, ?, ?, ?, ?, ?) ";
+    $completed = 0;
+
+    $sql = "INSERT INTO users (username, email, password, completedProfile) VALUES (?, ?, ?, ?) ";
 
 
     $stmt = $conn->prepare($sql);
-    $res = $stmt->execute([$firstname, $lastname, $username, $email, $phonenumber, $password]);
+    $res = $stmt->execute([$username, $email, $password, $completed]);
     $row = $stmt->rowCount();
 
-    $last_id =  $conn->lastInsertId();
-    $sql1 = "SELECT * FROM user WHERE id = ?";
+   //if query works
+    if ($res) {
+        return 'success';
+    }
+       else {
+          return 'failed';
+       }
+    
+}
+
+function completeProfile($firstname, $lastname, $phonenumber, $accountType, $region, $town, $quarter){
+
+    $conn = openConn();
+    $completed = 1;
+
+//insert location first 
+    $query = "INSERT INTO locations (region, town, quarter) VALUES (?, ?, ?) ";
+    $statement = $conn->prepare($query);
+    $res = $statement->execute([$region, $town, $quarter]);
 
 
    //if query works
     if ($res) {
         
-        echo('Result exists');
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        //update users now
+        $last_id =  $conn->lastInsertId();
+
+        $sql = "UPDATE  users SET firstName = ?, lastName = ?, phoneNumber = ?, accountType = ?, completedProfile = ?, location_id = ? ";
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->execute([$firstname, $lastname, $phonenumber, $accountType, $completed, $last_id]);
+
+        if($result){
         return 'success';
+
+        }else{
+            return 'failed';
+        }
+
+      
         }
        else {
           return 'failed';
@@ -32,7 +64,7 @@ function signup($firstname, $lastname, $username, $email, $phonenumber, $passwor
 function login($email, $password){
     $conn = openConn();
 
-    $sql = "SELECT * FROM user WHERE email = ? AND password = ?";
+    $sql = "SELECT * FROM users WHERE email = ? AND password = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute(array($email, $password));
@@ -54,7 +86,7 @@ function login($email, $password){
 function getUser($id){
     $conn = openConn();
 
-    $sql = "SELECT * FROM user WHERE id = ?";
+    $sql = "SELECT * FROM users WHERE id = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute(array($id));
@@ -73,7 +105,7 @@ function getUser($id){
 function editProfile($firstname, $lastname, $username, $email, $phonenumber, $id){
     $conn = openConn();
 
-    $sql = "UPDATE user SET firstname = ?, lastname = ?, username = ?, email = ?, phonenumber = ? WHERE id = ? ";
+    $sql = "UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, phonenumber = ? WHERE id = ? ";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute([$firstname, $lastname, $username, $email, $phonenumber, $id]);
@@ -133,8 +165,7 @@ function getReviews($id){
 function makeReview($customer_id, $seller_id, $rating, $review){
     $conn = openConn();
 
-    $conn = openConn();
-    $sql = "INSERT INTO ratings (customer_id, seller_id, rating, review,) VALUES (?, ?, ?, ?) ";
+    $sql = "INSERT INTO ratings (customer_id, shop_id, rating, review,) VALUES (?, ?, ?, ?) ";
 
 
     $stmt = $conn->prepare($sql);
@@ -143,6 +174,7 @@ function makeReview($customer_id, $seller_id, $rating, $review){
 
    //if query works
     if ($res) {
+        echo $res;
         return 'success';
         }
        else {
