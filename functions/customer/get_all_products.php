@@ -1,4 +1,11 @@
 <?php
 
-$jsonData = json_decode(file_get_contents("php://input"), true);
+include_once("../customer_functions.php");
 
+$result = getAllProducts();
+
+$data = array(
+    'state'=>$result,
+);
+
+echo json_encode($data);
