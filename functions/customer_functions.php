@@ -184,7 +184,7 @@ function makeReview($customer_id, $shop_id, $rating, $review){
 function deleteReview($id){
     $conn = openconn();
 
-    $sql = 'DELETE FROM ratings WHERE customer_id = ? ';
+    $sql = 'DELETE FROM ratings WHERE id = ? ';
 
     $stmt = $conn->prepare($sql);
    $res = $stmt->execute(array($id));
@@ -195,19 +195,47 @@ function deleteReview($id){
     }
 }
 
-function updatePassword($old_password, $new_password){
+function updatePassword($old_password, $new_password, $id){
     $conn = openconn();
 
-    $sql = 'UPDATE users SET password = ? WHERE customer_id = ? ';
+    $sql = 'UPDATE users SET password = ? WHERE uid = ? AND password = ?';
 
     $stmt = $conn->prepare($sql);
-   $res = $stmt->execute(array($new_password, $old_password));
+   $res = $stmt->execute(array($new_password, $id, $old_password));
 
-    if($res){
-        return 'success';
-    }
+   $row = $stmt->rowCount();
+
+   //if query works
+    if ($row>0) {
+        $data = getUser($id);
+        return $data;
+        }
+       else {
+          return 'failed';
+       }
 }
-function resetPassword(){}
+function resetPassword($new_password, $id){
+
+    $conn = openconn();
+
+    $sql = 'UPDATE users SET password = ? WHERE uid = ? ';
+
+    $stmt = $conn->prepare($sql);
+    $res = $stmt->execute(array($new_password, $id));
+    $row = $stmt->rowCount();
+
+    //if query works
+     if ($row>0) {
+         $data = getUser($id);
+         return $data;
+         }
+        else {
+           return 'failed';
+        }
+
+}
 function search(){}
+function searchWithFilter(){}
+
 
 function seeStores(){}
