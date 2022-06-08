@@ -3,10 +3,10 @@ include_once("../seller_functions.php");
 
     $jsonData = json_decode(file_get_contents("php://input"), true);
 
-    $shop_id = $jsonData['shop_id'];
+    $uid = $jsonData['uid'];
    
 
-    $result = getReviews($shop_id);
+    $result = getReviews($uid);
     //pt the result and name in associative array to send back to front end
 
     $data = array(
