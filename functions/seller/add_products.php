@@ -3,8 +3,6 @@ include_once("../seller_functions.php");
 
     $jsonData = json_decode(file_get_contents("php://input"), true);
 
-    $seller_id = $jsonData['seller_id'];
-    $name = $jsonData['name'];
     $category_id = $jsonData['category_id'];
     $name = $jsonData['name'];
     $price = $jsonData['price'];
