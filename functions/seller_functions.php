@@ -1,9 +1,6 @@
 <?php
 include_once('../../settings/connection.php');
 
-function uploadImage(){}
-function deleteImage(){}
-
 //ok
 function createStore($seller_id, $name){
 
@@ -20,8 +17,6 @@ function createStore($seller_id, $name){
        }
 
 }
-function deleteStore(){}
-
 //ok
 function viewStores($seller_id){
     $conn = openConn();
@@ -77,7 +72,7 @@ function addProducts($category_id, $name, $price, $image, $shop_id, $quantity){
 
 }
 
-
+//not yet
 function deleteProduct($shop_id){
     $conn = openConn();
     $sql = 'DELETE FROM products WHERE shop_id = ?';
@@ -111,19 +106,76 @@ function viewProducts($uid, $shop_id){
     }
     
 }
-function viewAllProducts($shop_id){}
 
+//ok 
+function viewAllProducts($seller_id){
+    $conn = openConn();
 
+    $sql = 'SELECT * FROM shop INNER JOIN products ON shop.seller_id = ?';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$seller_id]);
+    $row = $stmt->rowCount();
 
-function createPromotion($product_id){
-
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else {
+        return 'failed';
+    }
 }
-function getPromotion(){}
-function getShopReview($shop_id){}
+
 
 //ok
-function getReviews($shop_id){
+function createPromotion($category_id, $name, $price, $image, $shop_id, $quantity){
+    $conn = openConn();
 
+    $sql = 'INSERT INTO products (category_id, name, price, image, shop_id, quantity) VALUES (?, ?, ?, ?, ?, ?)';
+    $stmt = $conn->prepare($sql);
+    $res = $stmt->execute([$category_id, $name, $price, $image, $shop_id, $quantity]);
+
+    if ($res) {
+        $last_id =  $conn->lastInsertId();
+        $sql1 = "INSERT INTO promotions (product_id) VALUES (?)";
+        $stmt1 = $conn->prepare($sql1);
+        $result = $stmt1->execute([$last_id]);
+
+        if($result){
+            return 'success';
+    
+        }else{
+            return 'failed';
+        }
+
+    }
+    else {
+          return 'failed';
+    }
+
+}
+
+//ok
+function getPromotions($id){
+    $conn = openConn();
+
+    $sql = 'SELECT * FROM promotions WHERE seller_id = ?';
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }else{
+        return 'failed';
+    }
+
+}
+//ok
+function getShopReview($shop_id){
+
+    
     $conn = openConn();
 
     $sql = " SELECT ratings.rating, ratings.review FROM ratings INNER JOIN shop ON ratings.shop_id = ?";
@@ -139,16 +191,29 @@ function getReviews($shop_id){
     else {
         return 'failed';
     }
+}
+//
+function getReviews($seller_id){
+
+    $conn = openConn();
+
+    $sql = " SELECT * FROM ratings INNER JOIN shop ON shop.seller_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(array($seller_id));
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else {
+        return 'failed';
+    }
     
 }
 
 function getInvoice(){}
+function uploadImage(){}
+function deleteImage(){}
 
-function completeOrder(){} 
-function makeReview(){}
-function deleteReview(){}
-function updatePassword(){}
-function resetPassword(){}
-function search(){}
-
-function seeStores(){}

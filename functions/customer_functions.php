@@ -1,6 +1,7 @@
 <?php
 include_once('../../settings/connection.php');
 
+//ok
 function signup($username, $email, $password){
 
     $conn = openConn();
@@ -22,13 +23,13 @@ function signup($username, $email, $password){
        }
     
 }
-
+//ok
 function completeProfile($firstname, $lastname, $phonenumber, $accountType, $region, $town, $quarter){
 
     $conn = openConn();
     $completed = 1;
 
-//insert location first 
+
     $query = "INSERT INTO locations (region, town, quarter) VALUES (?, ?, ?) ";
     $statement = $conn->prepare($query);
     $res = $statement->execute([$region, $town, $quarter]);
@@ -60,7 +61,7 @@ function completeProfile($firstname, $lastname, $phonenumber, $accountType, $reg
     
 }
 
-
+//ok
 function login($email, $password){
     $conn = openConn();
 
@@ -83,6 +84,7 @@ function login($email, $password){
     
 }
 
+//ok
 function getUser($id){
     $conn = openConn();
 
@@ -102,6 +104,7 @@ function getUser($id){
        }
 }
 
+//ok
 function editProfile($firstname, $lastname, $username, $email, $phonenumber, $id){
     $conn = openConn();
 
@@ -121,6 +124,7 @@ function editProfile($firstname, $lastname, $username, $email, $phonenumber, $id
        }
 }
 
+//ok
 function getAllProducts(){
     $conn = openConn();
 
@@ -140,14 +144,107 @@ function getAllProducts(){
 
 }
 
-function getNew(){}
-function getSales(){}
+//ok
+function getSales(){
+    $conn = openConn();
 
-function getOrders(){}
-function createOrder(){}
-function deleteOrder(){}
-function completeOrder(){} 
+    $sql = 'SELECT * FROM promotions';
 
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else{
+        return 'failed';
+    }
+}
+
+//ok
+function getOrders($id){
+    $conn = openConn();
+
+    $sql = 'SELECT * FROM orders WHERE customer_id = ?';
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(array($id));
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else{
+        return 'failed';
+    }
+}
+
+//ok
+function insertOrderItem($product_id, $order_id){
+    $conn = openConn();
+
+    $query = 'INSERT INTO product_order (product_id, order_id) VALUES (?, ?)';
+    $stmt = $conn->prepare($query);
+    $res = $stmt->execute([$product_id, $order_id]);
+    $row = $stmt->rowCount();
+
+   //if query works
+    if ($res) {
+        echo 'GOOD';
+    }
+       else {
+          echo 'failed';
+       }
+
+}
+
+//ok
+function createOrder($customer_id, $shop_id, $date, $state, array $items){
+    $conn = openConn();
+
+    $sql = 'INSERT INTO orders (customer_id, shop_id, date, state) VALUES (?, ?, ?, ?)';
+
+    $stmt = $conn->prepare($sql);
+    $res = $stmt->execute([$customer_id, $shop_id, $date, $state]);
+    
+
+    if($res){
+        $last_id = $conn->lastInsertId();
+        for($i = 0; $i < sizeof($items); $i++){
+            insertOrderItem($items[$i], $last_id);
+        }
+        return 'success';
+    }
+    else{
+        return 'failed';
+    }
+}
+//
+function changeOrderState($customer_id, $state){
+    $conn = openConn();
+
+    $sql = 'UPDATE orders SET state = ? WHERE customer_id = ?';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$state, $customer_id]);
+
+    $row = $stmt->rowCount();
+
+    var_dump($row);
+    //if query works
+     if ($row>0) {
+         
+        return 'success';
+     }
+        else {
+           return 'failed';
+        }
+    
+
+}
+//ok
 function getReviews($id){
     $conn = openconn();
 
@@ -162,6 +259,8 @@ function getReviews($id){
         return $data;
     }
 }
+
+//ok
 function makeReview($customer_id, $shop_id, $rating, $review){
     $conn = openConn();
 
@@ -181,6 +280,8 @@ function makeReview($customer_id, $shop_id, $rating, $review){
           return 'failed';
        }
 }
+
+//nt yet
 function deleteReview($id){
     $conn = openconn();
 
@@ -195,6 +296,7 @@ function deleteReview($id){
     }
 }
 
+//ok
 function updatePassword($old_password, $new_password, $id){
     $conn = openconn();
 
@@ -214,6 +316,8 @@ function updatePassword($old_password, $new_password, $id){
           return 'failed';
        }
 }
+
+//ok
 function resetPassword($new_password, $id){
 
     $conn = openconn();
@@ -234,8 +338,25 @@ function resetPassword($new_password, $id){
         }
 
 }
+
+
 function search(){}
 function searchWithFilter(){}
 
+//ok
+function seeStores(){
+    $conn = openconn();
 
-function seeStores(){}
+    $sql = 'SELECT * FROM shop';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else{
+        return 'failed';
+    }
+}
