@@ -3,8 +3,8 @@ include_once("../customer_functions.php");
 
     $jsonData = json_decode(file_get_contents("php://input"), true);
 
-    $email = $jsonData['email'];
-    $password = $jsonData['password'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
    
 
     $result = login($email, $password);

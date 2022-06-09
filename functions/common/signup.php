@@ -4,9 +4,9 @@ include_once("../customer_functions.php");
 $jsonData = json_decode(file_get_contents("php://input"), true);
 
 
- $username = $jsonData['username'];
- $email = $jsonData['email'];
- $password = $jsonData['password'];
+ $username = $_POST['username'];
+ $email = $_POST['email'];
+ $password = $_POST['password'];
 
  $result = signup($username, $email, $password);
 
