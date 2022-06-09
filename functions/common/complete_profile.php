@@ -4,15 +4,16 @@ include_once("../customer_functions.php");
 $jsonData = json_decode(file_get_contents("php://input"), true);
 
 
- $firstname = $jsonData['firstname'];
- $lastname = $jsonData['lastname'];
- $phonenumber = $jsonData['phonenumber'];
- $accountType = $jsonData['accountType'];
- $region = $jsonData['region'];
- $town = $jsonData['town'];
- $quarter = $jsonData['quarter'];
+ $firstname = $_POST['firstName'];
+ $lastname = $_POST['lastName'];
+ $phonenumber = $_POST['phoneNumber'];
+ $accountType = $_POST['accountType'];
+ $region = $_POST['region'];
+ $town = $_POST['town'];
+ $quarter = $_POST['quarter'];
+ $uid = $_POST['uid'];
 
- $result = completeProfile($firstname, $lastname, $phonenumber, $accountType, $region, $town, $quarter);
+ $result = completeProfile($uid, $firstname, $lastname, $phonenumber, $accountType, $region, $town, $quarter);
 
  $data = array(
     'state'=>$result,
