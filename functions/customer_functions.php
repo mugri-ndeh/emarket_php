@@ -4,7 +4,11 @@ include_once('../../settings/connection.php');
 //ok
 function signup($username, $email, $password){
 
-    $conn = openConn();
+    if(accountExists($username)){
+        return 'account exists';
+    }
+
+   else {$conn = openConn();
     $completed = 0;
 
     $sql = "INSERT INTO users (username, email, password, completedProfile) VALUES (?, ?, ?, ?) ";
@@ -12,19 +16,40 @@ function signup($username, $email, $password){
 
     $stmt = $conn->prepare($sql);
     $res = $stmt->execute([$username, $email, $password, $completed]);
-    $row = $stmt->rowCount();
+    $userId = $conn->lastInsertId();
 
    //if query works
     if ($res) {
-        return 'success';
+        return array('success'=>$userId);
     }
        else {
           return 'failed';
        }
+    }
+    
+}
+
+function accountExists($username){
+    $conn = openConn();
+
+    $sql = "SELECT * FROM users WHERE username = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(array($username));
+
+    $row = $stmt->rowCount();
+
+   //if query works
+    if ($row>0) {
+        return true;
+    }
+       else {
+          return false;
+       }
     
 }
 //ok
-function completeProfile($firstname, $lastname, $phonenumber, $accountType, $region, $town, $quarter){
+function completeProfile($uid, $firstname, $lastname, $phonenumber, $accountType, $region, $town, $quarter){
 
     $conn = openConn();
     $completed = 1;
@@ -41,10 +66,10 @@ function completeProfile($firstname, $lastname, $phonenumber, $accountType, $reg
         //update users now
         $last_id =  $conn->lastInsertId();
 
-        $sql = "UPDATE  users SET firstName = ?, lastName = ?, phoneNumber = ?, accountType = ?, completedProfile = ?, location_id = ? ";
+        $sql = "UPDATE users SET firstName = ?, lastName = ?, phoneNumber = ?, accountType = ?, completedProfile = ?, location_id = ? WHERE uid = ?";
 
         $stmt = $conn->prepare($sql);
-        $result = $stmt->execute([$firstname, $lastname, $phonenumber, $accountType, $completed, $last_id]);
+        $result = $stmt->execute([$firstname, $lastname, $phonenumber, $accountType, $completed, $last_id, $uid]);
 
         if($result){
         return 'success';
@@ -128,7 +153,10 @@ function editProfile($firstname, $lastname, $username, $email, $phonenumber, $id
 function getAllProducts(){
     $conn = openConn();
 
-    $sql = 'SELECT * FROM products';
+    $sql = 'SELECT shop.id, shop.name, users.username, products.name FROM ((shop INNER JOIN users ON shop.id = users.uid) INNER JOIN products ON shop.id = products.shop_id) ';
+
+
+    $sql = 'SELECT * FROM (products INNER JOIN categories ON categories.id = products.category_id)';
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -143,7 +171,24 @@ function getAllProducts(){
     }
 
 }
+//ok
+function getPromo(){
+    $conn = openConn();
 
+    $sql = 'SELECT * FROM ((promotions INNER JOIN products ON promotions.product_id = products.id) INNER JOIN categories ON categories.id = products.category_id)';
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else{
+        return 'failed';
+    }
+}
 //ok
 function getSales(){
     $conn = openConn();
@@ -167,7 +212,7 @@ function getSales(){
 function getOrders($id){
     $conn = openConn();
 
-    $sql = 'SELECT * FROM orders WHERE customer_id = ?';
+    $sql = 'SELECT * FROM ((orders INNER  customer_id = ?))';
 
     $stmt = $conn->prepare($sql);
     $stmt->execute(array($id));
@@ -339,6 +384,42 @@ function resetPassword($new_password, $id){
 
 }
 
+function addToWish($id, $customer_id){
+
+    $conn = Openconn();
+
+    $sql = 'INSERT INTO wishlist (product_id, customer_id) VALUES (?, ?)';
+
+    $stmt = $conn->prepare($sql);
+    $res = $stmt->execute(array($id, $customer_id));
+
+    if($res){
+        return 'success';
+    }
+    else{
+        return 'failed';
+    }
+
+}
+
+function getWishList($uid){
+    $conn = openconn();
+
+    $sql = 'SELECT users.uid, users.username, products.name FROM ((products INNER JOIN wishlist ON products.id = wishlist.product_id) INNER JOIN users ON wishlist.customer_id = ?)';
+    $sql = 'SELECT users.username FROM users INNER JOIN wishlist ON wishlist.customer_id = ? ';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(array($uid));
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else{
+        return 'failed';
+    }
+} 
+
 
 function search(){}
 function searchWithFilter(){}
@@ -347,7 +428,9 @@ function searchWithFilter(){}
 function seeStores(){
     $conn = openconn();
 
-    $sql = 'SELECT * FROM shop';
+    
+
+    $sql = 'SELECT shop.id, shop.name, users.username, products.name FROM ((shop INNER JOIN users ON shop.id = users.uid) INNER JOIN products ON shop.id = products.shop_id) ';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $row = $stmt->rowCount();
@@ -359,4 +442,22 @@ function seeStores(){
     else{
         return 'failed';
     }
+}
+
+function getShopProducts($id){
+    
+        $conn = openconn();
+    
+        $sql = 'SELECT * FROM products INNER JOIN categories ON products.category_id = categories.id WHERE shop_id = ? ';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id]);
+        $row = $stmt->rowCount();
+    
+        if($row>0){
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $data;
+        }
+        else{
+            return 'failed';
+}
 }
