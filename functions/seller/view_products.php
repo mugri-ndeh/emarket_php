@@ -3,12 +3,11 @@ include_once("../seller_functions.php");
 
     $jsonData = json_decode(file_get_contents("php://input"), true);
 
-    $shop_id = $jsonData['shop_id'];
-    $uid = $jsonData['uid'];
+    $shop_id = $_POST['shop_id'];
 
    
 
-    $result = viewProducts($uid,$shop_id);
+    $result = viewProducts($shop_id);
     //pt the result and name in associative array to send back to front end
 
     $data = array(
