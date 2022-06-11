@@ -3,12 +3,12 @@ include_once("../seller_functions.php");
 
     $jsonData = json_decode(file_get_contents("php://input"), true);
 
-    $category_id = $jsonData['category_id'];
-    $name = $jsonData['name'];
-    $price = $jsonData['price'];
-    $image = $jsonData['image'];
-    $shop_id = $jsonData['shop_id'];
-    $quantity = $jsonData['quantity'];
+    $category_id = $_POST['category_id'];
+    $name = $_POST['name'];
+    $price = $_POST['price'];
+    $image = $_POST['image'];
+    $shop_id = $_POST['shop_id'];
+    $quantity = $_POST['quantity'];
    
 
     $result = addProducts($category_id, $name, $price, $image, $shop_id, $quantity);
