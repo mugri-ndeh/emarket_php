@@ -3,7 +3,7 @@ include_once("../seller_functions.php");
 
     $jsonData = json_decode(file_get_contents("php://input"), true);
 
-    $uid = $jsonData['seller_id'];
+    $uid = $_POST['id'];
 
    
 
