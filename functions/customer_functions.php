@@ -430,7 +430,7 @@ function seeStores(){
 
     
 
-    $sql = 'SELECT shop.id, shop.name, users.username, products.name FROM ((shop INNER JOIN users ON shop.id = users.uid) INNER JOIN products ON shop.id = products.shop_id) ';
+    $sql = 'SELECT shop.id, shop.name, users.username FROM shop INNER JOIN users ON shop.id = users.uid ';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $row = $stmt->rowCount();
