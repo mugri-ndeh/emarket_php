@@ -209,18 +209,50 @@ function getSales(){
 }
 
 //ok
+function getOrderItem($product_id){
+    $conn = openConn();
+
+    $sql = 'SELECT * FROM products WHERE id = ?';
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(array($product_id));
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $data;
+    }
+    else{
+        return 'failed';
+    }
+}
+
 function getOrders($id){
     $conn = openConn();
 
-    $sql = 'SELECT * FROM ((orders INNER  customer_id = ?))';
+    $sql = 'SELECT * FROM orders Where customer_id = ?';
 
     $stmt = $conn->prepare($sql);
     $stmt->execute(array($id));
     $row = $stmt->rowCount();
 
+
     if($row>0){
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $data;
+
+       
+        $orders = [];
+
+        foreach($data as $item){
+         $fooditem = getOrderItem($item['id']);
+    
+            array_push($orders, array(
+                'items'=> $fooditem,
+                'order'=>$item
+              ));
+        }
+        return $orders;
     }
     else{
         return 'failed';
@@ -238,22 +270,22 @@ function insertOrderItem($product_id, $order_id){
 
    //if query works
     if ($res) {
-        echo 'GOOD';
+        return 'GOOD';
     }
        else {
-          echo 'failed';
+          return 'failed';
        }
 
 }
 
 //ok
-function createOrder($customer_id, $shop_id, $date, $state, array $items){
+function createOrder($customer_id, $shop_id, $date, $state, array $items, $qty,  $priceTotal){
     $conn = openConn();
 
-    $sql = 'INSERT INTO orders (customer_id, shop_id, date, state) VALUES (?, ?, ?, ?)';
+    $sql = 'INSERT INTO orders (customer_id, shop_id, date, state, qty, price_total) VALUES (?, ?, ?, ?, ?, ?)';
 
     $stmt = $conn->prepare($sql);
-    $res = $stmt->execute([$customer_id, $shop_id, $date, $state]);
+    $res = $stmt->execute([$customer_id, $shop_id, $date, $state, $qty, $priceTotal]);
     
 
     if($res){
@@ -405,8 +437,8 @@ function addToWish($id, $customer_id){
 function getWishList($uid){
     $conn = openconn();
 
-    $sql = 'SELECT users.uid, users.username, products.name FROM ((products INNER JOIN wishlist ON products.id = wishlist.product_id) INNER JOIN users ON wishlist.customer_id = ?)';
-    $sql = 'SELECT users.username FROM users INNER JOIN wishlist ON wishlist.customer_id = ? ';
+    // $sql = 'SELECT users.uid, users.username, products.name FROM ((products INNER JOIN wishlist ON products.id = wishlist.product_id) INNER JOIN users ON wishlist.customer_id = ?)';
+    $sql = 'SELECT products.id, products.name, products.shop_id, products.category_id, products.quantity, products.price, products.image FROM products RIGHT JOIN wishlist ON wishlist.customer_id = ? WHERE wishlist.product_id = products.id';
     $stmt = $conn->prepare($sql);
     $stmt->execute(array($uid));
     $row = $stmt->rowCount();
@@ -430,7 +462,7 @@ function seeStores(){
 
     
 
-    $sql = 'SELECT shop.id, shop.name, users.username FROM shop INNER JOIN users ON shop.id = users.uid ';
+    $sql = 'SELECT * FROM shop';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $row = $stmt->rowCount();
