@@ -2,12 +2,12 @@
 include_once('../../settings/connection.php');
 
 //ok
-function createStore($seller_id, $name){
+function createStore($seller_id, $name, $shop_img){
 
     $conn = openConn();
-    $sql = 'INSERT INTO shop (seller_id, name) VALUES (?,?)';
+    $sql = 'INSERT INTO shop (seller_id, name, shop_img) VALUES (?,?,?)';
     $stmt = $conn->prepare($sql);
-    $res = $stmt->execute([$seller_id, $name]);
+    $res = $stmt->execute([$seller_id, $name, $shop_img]);
 
     if ($res) {
         return 'success';
@@ -90,11 +90,30 @@ function deleteProduct($shop_id){
 }
 
 //ok
-function viewProducts($uid, $shop_id){
+function viewProducts($shop_id){
     $conn = openConn();
         $sql = 'SELECT * FROM products WHERE shop_id = ?';
     $stmt = $conn->prepare($sql);
-    $stmt->execute([$uid]);
+    $stmt->execute([$shop_id]);
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else {
+        return 'failed';
+    }
+    
+}
+
+function getCategories(){
+    $conn = openConn();
+
+    $sql = 'SELECT * FROM categories';
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
     $row = $stmt->rowCount();
 
     if($row>0){
@@ -214,6 +233,8 @@ function getReviews($seller_id){
 }
 
 function getInvoice(){}
-function uploadImage(){}
+function uploadImage(){
+    
+}
 function deleteImage(){}
 
