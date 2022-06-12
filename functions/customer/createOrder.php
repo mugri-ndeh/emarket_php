@@ -14,6 +14,7 @@ $jsonData = json_decode(file_get_contents("php://input"), true);
  $qty = $_POST['qty'];
  $priceTotal = $_POST['price_total'];
 
+
 $result = createOrder($customer_id, $shop_id, $date, $state, $items, $qty, $priceTotal);
 
 $data = array(
