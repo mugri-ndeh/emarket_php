@@ -1,4 +1,6 @@
 <?php
+
+    include_once("../customer_functions.php");
     $firstname = $_POST['firstName'];
     $lastname = $_POST['lastName'];
     $username = $_POST['username'];
