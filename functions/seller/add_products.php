@@ -13,8 +13,9 @@ include_once("../seller_functions.php");
     $image = $_FILES['image']['name'];
 
 
-    $path = "../../uploads/shop/$name/$seller_id/shop_$shop_id/products";
-    $path1 = "uploads/shop/$name/$seller_id/shop_$shop_id/products";
+    $path = "../../uploads/$shop_id/$name/shop_$shop_id/products/";
+    $path1 = "uploads/$shop_id/$name/shop_$shop_id/products/";
+
     
     if (!is_dir($path)) {
         mkdir($path, 0755, true);
@@ -26,7 +27,7 @@ include_once("../seller_functions.php");
     $tmp_name = $_FILES['image']['tmp_name'];
 
 
-    $imresult = move_uploaded_file($tmp_name, $imgPath1);
+    $imresult = move_uploaded_file($tmp_name, $imgPath);
    
 
     $result = addProducts($category_id, $name, $price, $imgPath1, $shop_id, $quantity);
