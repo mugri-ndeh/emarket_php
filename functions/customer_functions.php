@@ -156,7 +156,7 @@ function getAllProducts(){
     $sql = 'SELECT shop.id, shop.name, users.username, products.name FROM ((shop INNER JOIN users ON shop.id = users.uid) INNER JOIN products ON shop.id = products.shop_id) ';
 
 
-    $sql = 'SELECT * FROM (products INNER JOIN categories ON categories.id = products.category_id)';
+    $sql = 'SELECT * FROM (products INNER JOIN categories ON categories.cid = products.category_id)';
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -175,7 +175,7 @@ function getAllProducts(){
 function getPromo(){
     $conn = openConn();
 
-    $sql = 'SELECT * FROM ((promotions INNER JOIN products ON promotions.product_id = products.id) INNER JOIN categories ON categories.id = products.category_id)';
+    $sql = 'SELECT * FROM ((promotions INNER JOIN products ON promotions.product_id = products.id) INNER JOIN categories ON categories.cid = products.category_id)';
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -453,7 +453,42 @@ function getWishList($uid){
 } 
 
 
-function search(){}
+function search($query){
+
+    $conn = openconn();
+    
+    $sql = 'SELECT * FROM products WHERE products.name LIKE ? ';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(["%$query%"]);
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else{
+        return 'failed';
+    }
+
+}
+function searchShop($query){
+
+    $conn = openconn();
+    
+    $sql = 'SELECT * FROM shop WHERE shop.name LIKE ? ';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(["%$query%"]);
+    $row = $stmt->rowCount();
+
+    if($row>0){
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+    else{
+        return 'failed';
+    }
+
+}
 function searchWithFilter(){}
 
 //ok
@@ -480,7 +515,7 @@ function getShopProducts($id){
     
         $conn = openconn();
     
-        $sql = 'SELECT * FROM products INNER JOIN categories ON products.category_id = categories.id WHERE shop_id = ? ';
+        $sql = 'SELECT * FROM products INNER JOIN categories ON products.category_id = categories.cid WHERE shop_id = ? ';
         $stmt = $conn->prepare($sql);
         $stmt->execute([$id]);
         $row = $stmt->rowCount();
