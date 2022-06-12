@@ -130,7 +130,7 @@ function getCategories(){
 function viewAllProducts($seller_id){
     $conn = openConn();
 
-    $sql = 'SELECT * FROM shop INNER JOIN products ON shop.seller_id = ?';
+    $sql = 'SELECT * FROM shop INNER JOIN products ON shop.seller_id = ? WHERE shop.id = products.shop_id';
     $stmt = $conn->prepare($sql);
     $stmt->execute([$seller_id]);
     $row = $stmt->rowCount();
